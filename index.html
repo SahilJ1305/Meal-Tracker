@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Indian Muscle Growth Meal Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-bg: #1a1a1a;
+      --secondary-bg: #2c2c2c;
+      --card-bg: #333333;
+      --accent-primary: #e44d26;
+      --accent-success: #4CAF50;
+      --text-primary: #f0f0f0;
+      --text-secondary: #b0b0b0;
+      --border-color: #444444;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      --shadow-hover: 0 6px 20px rgba(0, 0, 0, 0.4);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, var(--primary-bg) 0%, #2a2a2a 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 40px;
+      padding: 40px 20px;
+      background: linear-gradient(135deg, var(--accent-primary), #ff6b47);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+      animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+      0% { transform: translateX(-50px) translateY(-50px); }
+      100% { transform: translateX(50px) translateY(50px); }
+    }
+
+    .header h1 {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Calendar Styles */
+    .calendar-container {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 30px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border-color);
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .calendar-title {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .calendar-nav {
+      display: flex;
+      gap: 10px;
+    }
+
+    .calendar-nav button {
+      background: var(--secondary-bg);
+      border: none;
+      color: var(--text-primary);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .calendar-nav button:hover {
+      background: var(--accent-primary);
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+    }
+
+    .calendar-day-header {
+      text-align: center;
+      font-weight: 600;
+      padding: 10px;
+      color: var(--accent-primary);
+      font-size: 0.9rem;
+    }
+
+    .calendar-day {
+      background: var(--secondary-bg);
+      border-radius: 10px;
+      padding: 12px;
+      min-height: 80px;
+      cursor: pointer;
+      transition: transform 0.2s;
+      border: 1px solid var(--border-color);
+      position: relative;
+    }
+
+    .calendar-day:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .calendar-day.empty {
+      background: transparent;
+      border: none;
+      cursor: default;
+    }
+
+    .calendar-day.completed {
+      background: rgba(76, 175, 80, 0.2);
+      border: 1px solid var(--accent-success);
+    }
+
+    .calendar-day.completed .date-number {
+      color: var(--accent-success);
+    }
+
+    .calendar-day.partial {
+      background: rgba(255, 165, 0, 0.2);
+      border: 1px solid #FFA500;
+    }
+
+    .calendar-day.partial .date-number {
+      color: #FFA500;
+    }
+
+    .calendar-day.today {
+      border: 2px solid var(--accent-primary);
+    }
+
+    .calendar-day.today .date-number {
+      color: var(--accent-primary);
+      font-weight: bold;
+    }
+
+    .date-number {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      font-size: 1.1rem;
+    }
+
+    .day-status {
+      position: absolute;
+      bottom: 5px;
+      left: 5px;
+      right: 5px;
+      font-size: 0.7rem;
+      text-align: center;
+      padding: 2px;
+      border-radius: 4px;
+    }
+
+    .completed-status {
+      background: var(--accent-success);
+      color: white;
+    }
+
+    .partial-status {
+      background: #FFA500;
+      color: white;
+    }
+
+    /* Meal Plan View */
+    .hidden {
+      display: none;
+    }
+
+    .back-to-calendar {
+      background: var(--secondary-bg);
+      color: var(--text-primary);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.3s;
+    }
+
+    .back-to-calendar:hover {
+      background: var(--accent-primary);
+    }
+
+    /* Stats Bar */
+    .stats-bar {
+      display: flex;
+      justify-content: space-around;
+      background: var(--secondary-bg);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    /* Meal Plan Container */
+    .day-container {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: var(--shadow);
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .day-completed {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--accent-success);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .day-header {
+      margin-bottom: 20px;
+    }
+
+    .day-title {
+      font-family: 'Montserrat', sans-serif;
+      color: var(--accent-primary);
+    }
+
+    .meals-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .meal-section {
+      background: var(--secondary-bg);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .meal-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .meal-icon {
+      font-size: 1.5rem;
+    }
+
+    .meal-items {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .meal-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .meal-item input[type="checkbox"] {
+      accent-color: var(--accent-primary);
+    }
+
+    .meal-item-text {
+      flex: 1;
+    }
+
+    .progress-container {
+      margin-top: 30px;
+      background: var(--secondary-bg);
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .progress {
+      height: 10px;
+      background: var(--primary-bg);
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      background: var(--accent-primary);
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .submit-day-btn {
+      width: 100%;
+      padding: 15px;
+      margin-top: 20px;
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .submit-day-btn:hover {
+      background: #ff6b47;
+    }
+
+    .submit-day-btn:disabled {
+      background: var(--border-color);
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>💪 Indian Muscle Growth Meal Tracker</h1>
+      <p>Track your daily nutrition for optimal muscle building</p>
+    </div>
+
+    <!-- Calendar View -->
+    <div id="calendarView">
+      <div class="calendar-container">
+        <div class="calendar-header">
+          <h2 class="calendar-title" id="calendarMonthYear">June 2024</h2>
+          <div class="calendar-nav">
+            <button id="prevMonth">◀ Previous</button>
+            <button id="todayBtn">Today</button>
+            <button id="nextMonth">Next ▶</button>
+          </div>
+        </div>
+        <div class="calendar-grid" id="calendarDaysHeader">
+          <div class="calendar-day-header">Sun</div>
+          <div class="calendar-day-header">Mon</div>
+          <div class="calendar-day-header">Tue</div>
+          <div class="calendar-day-header">Wed</div>
+          <div class="calendar-day-header">Thu</div>
+          <div class="calendar-day-header">Fri</div>
+          <div class="calendar-day-header">Sat</div>
+        </div>
+        <div class="calendar-grid" id="calendarDates"></div>
+      </div>
+    </div>
+
+    <!-- Meal Plan View (hidden by default) -->
+    <div id="mealPlanView" class="hidden">
+      <button id="backToCalendar" class="back-to-calendar">
+        ← Back to Calendar
+      </button>
+
+      <div class="stats-bar">
+        <div class="stat-item">
+          <span class="stat-number" id="totalDays">365</span>
+          <div class="stat-label">Total Days</div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="completedDays">0</span>
+          <div class="stat-label">Completed Days</div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-number" id="overallProgress">0%</span>
+          <div class="stat-label">Overall Progress</div>
+        </div>
+      </div>
+
+      <div id="mealPlanContainer">
+        <!-- Meal plan will be loaded here when a day is selected -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== CALENDAR LOGIC =====
+    let currentMonth = new Date().getMonth();
+    let currentYear = new Date().getFullYear();
+    const calendarDates = document.getElementById('calendarDates');
+    const calendarMonthYear = document.getElementById('calendarMonthYear');
+    const prevMonthBtn = document.getElementById('prevMonth');
+    const nextMonthBtn = document.getElementById('nextMonth');
+    const todayBtn = document.getElementById('todayBtn');
+    const calendarView = document.getElementById('calendarView');
+    const mealPlanView = document.getElementById('mealPlanView');
+    const backToCalendarBtn = document.getElementById('backToCalendar');
+
+    // Generate calendar
+    function generateCalendar(month, year) {
+      calendarDates.innerHTML = '';
+      
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const lastDayOfLastMonth = new Date(year, month, 0).getDate();
+      
+      // Previous month's days
+      for (let i = firstDay - 1; i >= 0; i--) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day empty';
+        const dateNumber = document.createElement('div');
+        dateNumber.className = 'date-number';
+        dateNumber.textContent = lastDayOfLastMonth - i;
+        day.appendChild(dateNumber);
+        calendarDates.appendChild(day);
+      }
+      
+      // Current month's days
+      const today = new Date();
+      for (let i = 1; i <= daysInMonth; i++) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day';
+        
+        const dateNumber = document.createElement('div');
+        dateNumber.className = 'date-number';
+        dateNumber.textContent = i;
+        day.appendChild(dateNumber);
+        
+        // Highlight today
+        if (i === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+          day.classList.add('today');
+        }
+        
+        // Check completion status
+        const dateStr = formatDate(year, month + 1, i);
+        const dayCompleted = localStorage.getItem(`day-completed-${dateStr}`) === "true";
+        const dayPartial = checkPartialCompletion(dateStr);
+        
+        if (dayCompleted) {
+          day.classList.add('completed');
+          const status = document.createElement('div');
+          status.className = 'day-status completed-status';
+          status.textContent = 'Completed';
+          day.appendChild(status);
+        } else if (dayPartial) {
+          day.classList.add('partial');
+          const status = document.createElement('div');
+          status.className = 'day-status partial-status';
+          status.textContent = 'Partial';
+          day.appendChild(status);
+        }
+        
+        // Add click event
+        day.addEventListener('click', () => loadMealPlanForDay(year, month, i));
+        calendarDates.appendChild(day);
+      }
+      
+      // Next month's days (to fill the grid)
+      const daysToAdd = 42 - (firstDay + daysInMonth); // 6 rows x 7 days = 42 cells
+      for (let i = 1; i <= daysToAdd; i++) {
+        const day = document.createElement('div');
+        day.className = 'calendar-day empty';
+        const dateNumber = document.createElement('div');
+        dateNumber.className = 'date-number';
+        dateNumber.textContent = i;
+        day.appendChild(dateNumber);
+        calendarDates.appendChild(day);
+      }
+      
+      // Update month/year display
+      calendarMonthYear.textContent = new Date(year, month).toLocaleDateString('en-US', {
+        month: 'long',
+        year: 'numeric'
+      });
+    }
+
+    // Check if a day has partial completion
+    function checkPartialCompletion(dateStr) {
+      const meals = [
+        "Post-Workout", "Breakfast", "Lunch", 
+        "Evening Snack", "Dinner", "Before Bed"
+      ];
+      
+      let completedItems = 0;
+      let totalItems = 0;
+      
+      meals.forEach(meal => {
+        const mealData = localStorage.getItem(`${dateStr}-${meal}`);
+        if (mealData) {
+          const items = JSON.parse(mealData);
+          completedItems += items.filter(item => item.completed).length;
+          totalItems += items.length;
+        } else {
+          // If the meal exists in our plan but isn't in localStorage, count its items
+          const mealPlan = meals.find(m => m.name === meal);
+          if (mealPlan) {
+            totalItems += mealPlan.items.length;
+          }
+        }
+      });
+      
+      return completedItems > 0 && completedItems < totalItems;
+    }
+
+    // Format date as YYYY-MM-DD
+    function formatDate(year, month, day) {
+      return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+    }
+
+    // ===== MEAL PLAN LOGIC =====
+    const meals = [
+      {
+        name: "Post-Workout",
+        icon: "🏋️",
+        items: ["1 scoop whey protein or 4 egg whites", "1 banana or 2 dates", "Coconut water or plain water"]
+      },
+      {
+        name: "Breakfast",
+        icon: "🌅",
+        items: ["3 eggs + 3 egg whites or 150g paneer", "2 multigrain rotis or oats", "1 banana or apple", "5 soaked almonds or 1 tsp peanut butter"]
+      },
+      {
+        name: "Lunch",
+        icon: "🍽️",
+        items: ["150g chicken or 100g paneer/tofu", "1.5 cups rice or 2–3 rotis", "1 katori dal", "Cooked veggies", "Curd", "Salad"]
+      },
+      {
+        name: "Evening Snack",
+        icon: "🥜",
+        items: ["Sprout chaat or roasted chana", "1 scoop whey protein (optional)"]
+      },
+      {
+        name: "Dinner",
+        icon: "🌙",
+        items: ["150g paneer/tofu or 3 eggs", "Stir-fried vegetables", "1 small phulka or sweet potato"]
+      },
+      {
+        name: "Before Bed",
+        icon: "😴",
+        items: ["1 glass warm milk", "2 soaked almonds or 1 tsp flax seeds"]
+      }
+    ];
+
+    // Load meal plan for a specific day
+    function loadMealPlanForDay(year, month, day) {
+      const date = new Date(year, month, day);
+      const dateStr = formatDate(year, month + 1, day);
+      const formattedDate = date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+
+      // Hide calendar, show meal plan
+      calendarView.classList.add('hidden');
+      mealPlanView.classList.remove('hidden');
+
+      // Clear previous meal plan
+      const container = document.getElementById('mealPlanContainer');
+      container.innerHTML = '';
+
+      // Create day container
+      const dayDiv = document.createElement('div');
+      dayDiv.className = 'day-container';
+      dayDiv.dataset.date = dateStr;
+
+      // Check if day is completed
+      const dayCompleted = localStorage.getItem(`day-completed-${dateStr}`) === "true";
+      if (dayCompleted) {
+        dayDiv.classList.add('completed');
+        
+        const completedBadge = document.createElement('div');
+        completedBadge.className = 'day-completed';
+        completedBadge.textContent = 'COMPLETED';
+        dayDiv.appendChild(completedBadge);
+      }
+
+      // Create day header
+      const dayHeader = document.createElement('div');
+      dayHeader.className = 'day-header';
+      
+      const dayTitle = document.createElement('h2');
+      dayTitle.className = 'day-title';
+      dayTitle.textContent = formattedDate;
+      
+      dayHeader.appendChild(dayTitle);
+      dayDiv.appendChild(dayHeader);
+
+      // Create meals grid
+      const mealsGrid = document.createElement('div');
+      mealsGrid.className = 'meals-grid';
+
+      let totalItems = 0;
+      let checkboxes = [];
+
+      meals.forEach(meal => {
+        const section = document.createElement('div');
+        section.className = 'meal-section';
+
+        const header = document.createElement('div');
+        header.className = 'meal-header';
+        
+        const icon = document.createElement('div');
+        icon.className = 'meal-icon';
+        icon.textContent = meal.icon;
+        
+        const title = document.createElement('h3');
+        title.textContent = meal.name;
+        
+        header.appendChild(icon);
+        header.appendChild(title);
+        section.appendChild(header);
+
+        const itemsContainer = document.createElement('div');
+        itemsContainer.className = 'meal-items';
+
+        // Get saved meal data or initialize
+        let savedMealData = localStorage.getItem(`${dateStr}-${meal.name}`);
+        if (!savedMealData) {
+          // Initialize with all items not completed
+          savedMealData = JSON.stringify(meal.items.map(item => ({
+            text: item,
+            completed: false
+          })));
+          localStorage.setItem(`${dateStr}-${meal.name}`, savedMealData);
+        }
+        
+        const mealItems = JSON.parse(savedMealData);
+        
+        mealItems.forEach(item => {
+          totalItems++;
+          
+          const itemDiv = document.createElement('div');
+          itemDiv.className = 'meal-item';
+
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.id = `${dateStr}-${meal.name}-${item.text.replace(/\s+/g, '-')}`;
+          checkbox.checked = item.completed;
+          checkbox.disabled = dayCompleted;
+
+          const label = document.createElement('label');
+          label.htmlFor = checkbox.id;
+          label.className = 'meal-item-text';
+          label.textContent = item.text;
+
+          itemDiv.appendChild(checkbox);
+          itemDiv.appendChild(label);
+          itemsContainer.appendChild(itemDiv);
+
+          checkboxes.push({
+            checkbox,
+            meal: meal.name,
+            item: item.text
+          });
+        });
+
+        section.appendChild(itemsContainer);
+        mealsGrid.appendChild(section);
+      });
+
+      // Create progress section
+      const progressContainer = document.createElement('div');
+      progressContainer.className = 'progress-container';
+      
+      const progressHeader = document.createElement('div');
+      progressHeader.className = 'progress-header';
+      
+      const progressLabel = document.createElement('div');
+      progressLabel.className = 'progress-label';
+      progressLabel.textContent = 'Daily Progress';
+      
+      const progressPercentage = document.createElement('div');
+      progressPercentage.className = 'progress-percentage';
+      progressPercentage.textContent = '0%';
+      
+      progressHeader.appendChild(progressLabel);
+      progressHeader.appendChild(progressPercentage);
+      
+      const progress = document.createElement('div');
+      progress.className = 'progress';
+      const progressBar = document.createElement('div');
+      progressBar.className = 'progress-bar';
+      progress.appendChild(progressBar);
+      
+      progressContainer.appendChild(progressHeader);
+      progressContainer.appendChild(progress);
+
+      // Create submit button
+      const submitBtn = document.createElement('button');
+      submitBtn.className = 'submit-day-btn';
+      submitBtn.textContent = 'Submit Day';
+      submitBtn.disabled = true;
+      submitBtn.addEventListener('click', () => {
+        localStorage.setItem(`day-completed-${dateStr}`, 'true');
+        checkboxes.forEach(cb => cb.checkbox.disabled = true);
+        dayDiv.classList.add('completed');
+        submitBtn.style.display = 'none';
+        
+        // Add completed badge if not already there
+        if (!document.querySelector('.day-completed')) {
+          const completedBadge = document.createElement('div');
+          completedBadge.className = 'day-completed';
+          completedBadge.textContent = 'COMPLETED';
+          dayDiv.insertBefore(completedBadge, dayDiv.firstChild);
+        }
+        
+        updateOverallStats();
+        // Update calendar if visible
+        generateCalendar(currentMonth, currentYear);
+      });
+
+      // Update progress function
+      function updateProgress() {
+        const completed = checkboxes.filter(cb => cb.checkbox.checked).length;
+        const percent = Math.round((completed / totalItems) * 100);
+        progressBar.style.width = `${percent}%`;
+        progressPercentage.textContent = `${percent}%`;
+        submitBtn.disabled = percent < 100 || dayCompleted;
+      }
+
+      // Add event listeners to checkboxes
+      checkboxes.forEach(({checkbox, meal, item}) => {
+        checkbox.addEventListener('change', () => {
+          // Update the saved meal data
+          const savedMealData = localStorage.getItem(`${dateStr}-${meal}`);
+          if (savedMealData) {
+            const mealItems = JSON.parse(savedMealData);
+            const itemToUpdate = mealItems.find(mi => mi.text === item);
+            if (itemToUpdate) {
+              itemToUpdate.completed = checkbox.checked;
+              localStorage.setItem(`${dateStr}-${meal}`, JSON.stringify(mealItems));
+            }
+          }
+          
+          updateProgress();
+        });
+      });
+
+      // Initial progress update
+      updateProgress();
+
+      // Assemble the day container
+      dayDiv.appendChild(mealsGrid);
+      dayDiv.appendChild(progressContainer);
+      
+      if (!dayCompleted) {
+        dayDiv.appendChild(submitBtn);
+      }
+
+      container.appendChild(dayDiv);
+      updateOverallStats();
+    }
+
+    // Update overall stats
+    function updateOverallStats() {
+      let totalCompleted = 0;
+      let totalDays = 365; // Assuming 1 year tracking
+      
+      // Count completed days
+      const today = new Date();
+      for (let i = 0; i < totalDays; i++) {
+        const date = new Date(today);
+        date.setDate(date.getDate() + i);
+        const dateStr = formatDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
+        if (localStorage.getItem(`day-completed-${dateStr}`) === "true") {
+          totalCompleted++;
+        }
+      }
+      
+      document.getElementById('completedDays').textContent = totalCompleted;
+      document.getElementById('totalDays').textContent = totalDays;
+      document.getElementById('overallProgress').textContent = Math.round((totalCompleted / totalDays) * 100) + '%';
+    }
+
+    // ===== INITIALIZATION =====
+    document.addEventListener('DOMContentLoaded', () => {
+      // Generate current month's calendar
+      generateCalendar(currentMonth, currentYear);
+      
+      // Month navigation
+      prevMonthBtn.addEventListener('click', () => {
+        currentMonth--;
+        if (currentMonth < 0) {
+          currentMonth = 11;
+          currentYear--;
+        }
+        generateCalendar(currentMonth, currentYear);
+      });
+      
+      nextMonthBtn.addEventListener('click', () => {
+        currentMonth++;
+        if (currentMonth > 11) {
+          currentMonth = 0;
+          currentYear++;
+        }
+        generateCalendar(currentMonth, currentYear);
+      });
+      
+      // Today button
+      todayBtn.addEventListener('click', () => {
+        const today = new Date();
+        currentMonth = today.getMonth();
+        currentYear = today.getFullYear();
+        generateCalendar(currentMonth, currentYear);
+      });
+      
+      // Back to calendar button
+      backToCalendarBtn.addEventListener('click', () => {
+        mealPlanView.classList.add('hidden');
+        calendarView.classList.remove('hidden');
+        generateCalendar(currentMonth, currentYear);
+      });
+      
+      // Check if we should open a specific day (for direct linking)
+      const urlParams = new URLSearchParams(window.location.search);
+      const dayParam = urlParams.get('day');
+      if (dayParam) {
+        const [year, month, day] = dayParam.split('-');
+        loadMealPlanForDay(parseInt(year), parseInt(month) - 1, parseInt(day));
+      }
+      
+      // Initial stats update
+      updateOverallStats();
+    });
+  </script>
+</body>
+</html>
